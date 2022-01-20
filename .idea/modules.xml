@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/.idea/BAC1_code.iml" filepath="$PROJECT_DIR$/.idea/BAC1_code.iml" />
+=======
+      <module fileurl="file://$PROJECT_DIR$/.idea/BAC1.iml" filepath="$PROJECT_DIR$/.idea/BAC1.iml" />
+>>>>>>> 3a070bb (Added unversioned files)
     </modules>
   </component>
 </project>
