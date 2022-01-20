@@ -1,7 +1,10 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
 from csv_interface import *
+from pyqtgraph import PlotWidget, plot
+import pyqtgraph as pg
 
+# Used tutorial for PyQt5: https://build-system.fman.io/pyqt5-tutorial
 
 class AssetApplication(QDialog):
     def __init__(self, time, parent=None):
@@ -14,12 +17,29 @@ class AssetApplication(QDialog):
         with open("style.qss", "r") as styleSheet:
             self.setStyleSheet(styleSheet.read())
 
-        window = QWidget()
-        window.setWindowTitle("Asset Status")
-        layout = QVBoxLayout()
+        selectedTimeLabel = QLabel(time)
+        timeLabel = QLabel("&Time:")
+        timeLabel.setBuddy(selectedTimeLabel)
 
-        window.setLayout(layout)
-        window.show()
-        self.exec()
+        upperLeftLayout = QHBoxLayout()
+        upperLeftLayout.addWidget(timeLabel)
+        upperLeftLayout.addWidget(selectedTimeLabel)
+
+
+
+        mainLayout = QGridLayout()
+
+        self.setWindowTitle("Asset Status")
+        self.setLayout(mainLayout)
+
+        def createpersonGroupBox(self):
+            self.personGroupBox = QGroupBox("Person")
+            personInsideLabel = QLabel()
+            if time > 50:
+                personInsideLabel.setText("There is currently a person inside.")
+            else:
+                personInsideLabel.setText("There is currently no one inside.")
+
+
     # function to calculate KPI from sensor DATA
     #def telemetryKPI(self):
