@@ -1,19 +1,30 @@
-import pandas
+import numpy as np
 
 
-def generateGraphs(time):
-    dataFrame = pandas.read_csv('iot_telemetry_data.csv')
-    temp = dataFrame.loc[:, "temp"]
-    hum = dataFrame.loc[:, "humidity"]
-    menHum = hum.mean()
+def genereateRange(time):  # generate initial time range from user input
+    # function is used as base for the other data gen functions
+    # function generates the dataframe in only the timerange
 
-    # meanTemp = temp.mean()
-    # print(meanTemp)
-    # print(menHum)
+    df = pandas.read_csv('iot_telemetry_data.csv')  # read csv from file into a dataframe
+    tStart = time - 18000  # define range from user input - 3 hours
+    tEnd = time
+    temp = df[(df['ts'] >= tStart) & (df['ts'] <= tEnd)]  # trim data to time range from start - (start -3h)
+    return temp
 
-    timeBeginn = time - 18000
-    timeEnd = time
-    graphDataHumidity = dataFrame.loc[ > timeEnd, "humidity"]
-    return graphDataHumidity
 
-    # print(dataFrame.loc[:, ["temp"]])
+def genlpgMEAN(temp):
+    # generate mean humidity of last 3 hours
+    result = temp['lpg'].mean()
+    return result
+
+
+def genTempMEAN(temp):
+    # generate mean temperatur of last 3 hours
+    result = temp['temp'].mean()
+    return result
+
+
+def genSmokeMEAN(temp):
+    # generate mean smoke value
+    result = temp['smoke'].mean()
+    return result
