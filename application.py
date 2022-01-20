@@ -22,6 +22,7 @@ class AssetApplication(QDialog):
         upperLeftLayout.addWidget(timeLabel)
         upperLeftLayout.addWidget(selectedTimeLabel)
 
+
         mainLayout = QGridLayout()
 
         self.setWindowTitle("Asset Status")
@@ -30,10 +31,16 @@ class AssetApplication(QDialog):
         def createpersonGroupBox(self):
             self.personGroupBox = QGroupBox("Person")
             personInsideLabel = QLabel()
+
+            #dummy, so the other path is reachable
             if time > 50:
                 personInsideLabel.setText("There is currently a person inside.")
             else:
                 personInsideLabel.setText("There is currently no one inside.")
+
+        def createStatusBox(self):
+            self.statusBox = QGroupBox("Current Status")
+            statusLabel = QLabel("Status:")
 
     # function to calculate KPI from sensor DATA
     # def telemetryKPI(self):
