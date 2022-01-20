@@ -1,8 +1,5 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
-from csv_interface import *
-from pyqtgraph import PlotWidget, plot
-import pyqtgraph as pg
+
 
 # Used tutorial for PyQt5: https://build-system.fman.io/pyqt5-tutorial
 
@@ -25,8 +22,6 @@ class AssetApplication(QDialog):
         upperLeftLayout.addWidget(timeLabel)
         upperLeftLayout.addWidget(selectedTimeLabel)
 
-
-
         mainLayout = QGridLayout()
 
         self.setWindowTitle("Asset Status")
@@ -40,6 +35,5 @@ class AssetApplication(QDialog):
             else:
                 personInsideLabel.setText("There is currently no one inside.")
 
-
     # function to calculate KPI from sensor DATA
-    #def telemetryKPI(self):
+    # def telemetryKPI(self):
