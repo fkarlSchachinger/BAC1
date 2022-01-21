@@ -22,12 +22,12 @@ def genNumbers():
         values_exit.append(exittime)
 
     values_entry.insert(0, "entry")
-    values_exit.insert(0, "exit")
+    values_exit.insert(0, "leave")
 
 
     f = open('persondata.csv', 'w')
     for i in range(20):
-        f.write(str(values_entry[i]) + ", " + str(values_exit[i]))  # write one value
+        f.write(str(values_entry[i]) + "," + str(values_exit[i]))  # write one value
         f.write('\n')  # newline to get new column in csv
 
     f.close()
