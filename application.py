@@ -7,6 +7,8 @@ from csv_interface import generateRange
 import person_check
 
 # Used tutorial for PyQt5: https://build-system.fman.io/pyqt5-tutorial
+from pyqtgraph import PlotWidget
+
 
 class AssetApplication(QDialog):
     def __init__(self, str_time, parent=None):
@@ -31,8 +33,8 @@ class AssetApplication(QDialog):
 
         # Create upper part (outside of Group boxes)
         upperLeftLayout = QHBoxLayout()
-        upperLeftLayout.addWidget(timeLabel, 0, 0)
-        upperLeftLayout.addWidget(selectedTimeLabel, 0, 1)
+        # upperLeftLayout.addWidget(timeLabel, 0, 0)
+        # upperLeftLayout.addWidget(selectedTimeLabel, 0, 1)
         upperLeftLayout.addStretch(1)
 
         # Main Layout (this will actually be shown, all other parts should be nested inside this)
@@ -42,7 +44,6 @@ class AssetApplication(QDialog):
         mainLayout.addWidget(self.personGroupBox)
         mainLayout.addWidget(self.statusBox)
         mainLayout.addWidget(self.graphGroupBox)
-
 
         # Set main layout parameters, so it looks better
         mainLayout.setRowStretch(1, 1)
@@ -54,7 +55,6 @@ class AssetApplication(QDialog):
         self.setLayout(mainLayout)
         self.setStyle(QStyleFactory.create('Fusion'))
         self.setWindowTitle("Asset Status")
-
 
     def createpersonGroupBox(self):
         self.personGroupBox = QGroupBox("Person")
@@ -89,15 +89,17 @@ class AssetApplication(QDialog):
 
         dataFrame = generateRange(self.unix)
         time = dataFrame['ts']
+        time_val = numpy.array(time.values.tolist())
 
-        #lpg
-        lpgGraph = pg.PlotWidget()
+        # lpg
+        lpgGraph: PlotWidget = pg.PlotWidget()
         lpgValues = dataFrame['lpg']
+        lpg_val = numpy.array(lpgValues.values.tolist())
         lpgGraph.plotItem.setTitle('LPG Value')
         # plot failed
-        lpgGraph.plotItem.plot(time, lpgValues)
-        layout.addWidget(lpgGraph, 0, 0)
-
+        lpgGraph.plotItem.plot(time_val, lpg_val) #  this works -> fix values from dataframe by using "numpy.array(vals.values.tolist())"
+        layout.addWidget(lpgGraph)
+        """
         #temp
         tempGraph = PlotWidget()
         tempValues = dataFrame['temp']
@@ -111,7 +113,7 @@ class AssetApplication(QDialog):
         smokeGraph.plotItem.setTitle('Smoke')
         smokeGraph.plotItem.plot(time, smokeValues)
         layout.addWidget(smokeGraph, 0, 2)
-
+        """
         self.graphGroupBox.setLayout(layout)
 
     # function to calculate KPI from sensor DATA
