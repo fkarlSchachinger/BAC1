@@ -4,6 +4,7 @@ from dateutil.parser import parse
 from pyqtgraph import *
 import pyqtgraph as pg
 from csv_interface import generateRange
+import person_check
 
 # Used tutorial for PyQt5: https://build-system.fman.io/pyqt5-tutorial
 
@@ -61,10 +62,10 @@ class AssetApplication(QDialog):
         self.personGroupBox.setLayout(layout)
 
         # dummy, so the other path is reachable
-
-        if parse(self.str_time).timestamp() > 50:
-            personInsideLabel.setText("There is currently a person inside.")
-            personInsideLabel.setStyleSheet('color: yellow;')
+        people_inside = person_check.checkForPersons(self.unix)
+        if people_inside > 0:
+            personInsideLabel.setText("Number of people inside: " + str(people_inside))
+            personInsideLabel.setStyleSheet('color: orange;')
         else:
             personInsideLabel.setText("There is currently no one inside.")
             personInsideLabel.setStyleSheet('color: green;')
@@ -74,7 +75,7 @@ class AssetApplication(QDialog):
         layout = QVBoxLayout()
         statusLabel = QLabel("Status:")
 
-        layout.addWidget(statusLabel, 0, 0)
+        layout.addWidget(statusLabel)
 
         self.statusBox.setLayout(layout)
 
@@ -87,17 +88,23 @@ class AssetApplication(QDialog):
 
         #lpg
         lpgGraph = pg.PlotWidget()
-        lpgValue = dataFrame['lpg']
+        lpgValues = dataFrame['lpg']
         lpgGraph.plotItem.setTitle('LPG Value')
-        lpgGraph.plotItem.plot(time, lpgValue)
+        lpgGraph.plotItem.plot(time, lpgValues)
         layout.addWidget(lpgGraph, 0, 0)
 
         #temp
         tempGraph = PlotWidget()
         tempValues = dataFrame['temp']
+        tempGraph.plotItem.setTitle('Temperatures')
+        tempGraph.plotItem.plot(time, tempValues)
+        layout.addWidget(tempGraph)
 
         #smoke
-
+        smokeGraph = PlotWidget()
+        smokeValues = dataFrame['smoke']
+        smokeGraph.plotItem.setTitle('Smoke')
+        smokeGraph.plotItem.plot(time, smokeValues)
 
         self.graphGroupBox.setLayout(layout)
 

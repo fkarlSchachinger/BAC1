@@ -3,7 +3,6 @@ from genNumbers_PersonEntrance import *
 from csv_interface import *
 from application import *
 from dateutil.parser import parse
-import csv_interface
 
 
 def main():
@@ -17,11 +16,8 @@ def main():
 
     temperaturArr = temp['temp']
     timeArr = temp['ts']
-
-    # check for persons
-    person_timestamp = person_check.checkForPersons(time)
-    # print for debugging purposes
-    print(person_timestamp)
+    smokeArr = temp['smoke']
+    lpgArr = temp['lpg']
 
     context = QApplication([])
     context.setStyle('Fusion')
