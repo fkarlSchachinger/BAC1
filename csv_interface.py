@@ -5,7 +5,7 @@ def genereateRange(time):  # generate initial time range from user input
     # function is used as base for the other data gen functions
     # function generates the dataframe in only the timerange
 
-    df = pandas.read_csv('iot_telemetry_data.csv')  # read csv from file into a dataframe
+    df = pandas.read_csv('iot')  # read csv from file into a dataframe
     tStart = time - 18000  # define range from user input - 3 hours
     tEnd = time
     temp = df[(df['ts'] >= tStart) & (df['ts'] <= tEnd)]  # trim data to time range from start - (start -3h)
