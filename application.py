@@ -27,18 +27,22 @@ class AssetApplication(QDialog):
         # Create all the parts
         self.createStatusBox()
         self.createpersonGroupBox()
+        self.createGraphGroupBox()
+
         # Create upper part (outside of Group boxes)
         upperLeftLayout = QHBoxLayout()
-        upperLeftLayout.addWidget(timeLabel)
-        upperLeftLayout.addWidget(selectedTimeLabel)
+        upperLeftLayout.addWidget(timeLabel, 0, 0)
+        upperLeftLayout.addWidget(selectedTimeLabel, 0, 1)
         upperLeftLayout.addStretch(1)
 
         # Main Layout (this will actually be shown, all other parts should be nested inside this)
         mainLayout = QGridLayout()
         # Add all boxes to main layout
         mainLayout.addLayout(upperLeftLayout, 0, 0, 1, 1)
-        mainLayout.addWidget(self.personGroupBox, 1, 0)
-        mainLayout.addWidget(self.statusBox, 2, 0)
+        mainLayout.addWidget(self.personGroupBox)
+        mainLayout.addWidget(self.statusBox)
+        mainLayout.addWidget(self.graphGroupBox)
+
 
         # Set main layout parameters, so it looks better
         mainLayout.setRowStretch(1, 1)
@@ -90,6 +94,7 @@ class AssetApplication(QDialog):
         lpgGraph = pg.PlotWidget()
         lpgValues = dataFrame['lpg']
         lpgGraph.plotItem.setTitle('LPG Value')
+        # plot failed
         lpgGraph.plotItem.plot(time, lpgValues)
         layout.addWidget(lpgGraph, 0, 0)
 
@@ -98,13 +103,14 @@ class AssetApplication(QDialog):
         tempValues = dataFrame['temp']
         tempGraph.plotItem.setTitle('Temperatures')
         tempGraph.plotItem.plot(time, tempValues)
-        layout.addWidget(tempGraph)
+        layout.addWidget(tempGraph, 0, 1)
 
         #smoke
         smokeGraph = PlotWidget()
         smokeValues = dataFrame['smoke']
         smokeGraph.plotItem.setTitle('Smoke')
         smokeGraph.plotItem.plot(time, smokeValues)
+        layout.addWidget(smokeGraph, 0, 2)
 
         self.graphGroupBox.setLayout(layout)
 

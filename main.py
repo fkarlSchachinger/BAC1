@@ -14,11 +14,6 @@ def main():
     smoke = genSmokeMEAN(temp)
     temperatur = genTempMEAN(temp)
 
-    temperaturArr = temp['temp']
-    timeArr = temp['ts']
-    smokeArr = temp['smoke']
-    lpgArr = temp['lpg']
-
     context = QApplication([])
     context.setStyle('Fusion')
     our_app = AssetApplication(user_input)
