@@ -27,3 +27,7 @@ def genSmokeMEAN(temp):
     # generate mean smoke value
     result = temp['smoke'].mean()
     return result
+
+
+def genMean(df: pandas.DataFrame, columnName: str):
+    return df[columnName].mean()
