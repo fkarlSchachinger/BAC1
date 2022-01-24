@@ -1,3 +1,6 @@
+import datetime
+import math
+
 from PyQt5.QtWidgets import *
 import pandas as pds
 from dateutil.parser import parse
@@ -89,28 +92,38 @@ class AssetApplication(QDialog):
         dataFrame = generateRange(self.unix)
         time = dataFrame['ts']
         time_val = numpy.array(time.values.tolist())
+        t_mean = time_val.mean()
+        t_mean = math.trunc(t_mean)
+        t = datetime.datetime.fromtimestamp(t_mean)
 
         # lpg
         lpgGraph = PlotWidget()
         lpgValues = dataFrame['lpg']
         lpg_val = numpy.array(lpgValues.values.tolist())
-        lpgGraph.plotItem.setTitle('LPG Value')
-        lpgGraph.plotItem.plot(time_val, lpg_val) #  this works -> fix values from dataframe by using "numpy.array(vals.values.tolist())"
+        title = 'LPG Value ' + str(t)
+        lpgGraph.plotItem.setTitle(title)
+        lpgGraph.plotItem.plot(time_val, lpg_val)  # this works -> fix values from dataframe by using "numpy.array(vals.values.tolist())"
+
         layout.addWidget(lpgGraph)
-        #temp
+        lpgGraph.setYRange(0, 0.01)
+        # temp
         tempGraph = PlotWidget()
         tempValues = dataFrame['temp']
         temp_val = numpy.array(tempValues.values.tolist())
-        tempGraph.plotItem.setTitle('Temperatures')
+        title = 'Temperatures ' + str(t)
+        tempGraph.plotItem.setTitle(title)
         tempGraph.plotItem.plot(time_val, temp_val)
+        tempGraph.setYRange(15, 30)
         layout.addWidget(tempGraph)
 
-        #smoke
+        # smoke
         smokeGraph = PlotWidget()
         smokeValues = dataFrame['smoke']
         smoke_val = numpy.array(smokeValues.values.tolist())
-        smokeGraph.plotItem.setTitle('Smoke')
+        title = 'Smoke ' + str(t)
+        smokeGraph.plotItem.setTitle(title)
         smokeGraph.plotItem.plot(time_val, smoke_val)
+        smokeGraph.setYRange(0.01, 0.03)
         layout.addWidget(smokeGraph)
 
         self.graphGroupBox.setLayout(layout)
