@@ -6,7 +6,7 @@ from dateutil.parser import parse
 
 
 def main():
-    user_input = input("Time in Format: YYYY-MM-DD HH:mm:ss")
+    user_input = input("Time in Format: YYYY-MM-DD HH:mm:ss\n")
     time = parse(user_input).timestamp()  # time is in unixformat
     # genNumbers()
     temp = generateRange(time)
