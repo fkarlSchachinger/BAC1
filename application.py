@@ -33,17 +33,17 @@ class AssetApplication(QDialog):
 
         # Create upper part (outside of Group boxes)
         upperLeftLayout = QHBoxLayout()
-        # upperLeftLayout.addWidget(timeLabel, 0, 0)
-        # upperLeftLayout.addWidget(selectedTimeLabel, 0, 1)
+        upperLeftLayout.addWidget(timeLabel, 0)
+        upperLeftLayout.addWidget(selectedTimeLabel, 0)
         upperLeftLayout.addStretch(1)
 
         # Main Layout (this will actually be shown, all other parts should be nested inside this)
         mainLayout = QGridLayout()
         # Add all boxes to main layout
         mainLayout.addLayout(upperLeftLayout, 0, 0, 1, 1)
-        mainLayout.addWidget(self.personGroupBox)
-        mainLayout.addWidget(self.statusBox)
-        mainLayout.addWidget(self.graphGroupBox)
+        mainLayout.addWidget(self.personGroupBox, 1, 0)
+        mainLayout.addWidget(self.statusBox, 1, 1)
+        mainLayout.addWidget(self.graphGroupBox, 2, 0, 2, 2)
 
         # Set main layout parameters, so it looks better
         mainLayout.setRowStretch(1, 1)
@@ -85,35 +85,34 @@ class AssetApplication(QDialog):
 
     def createGraphGroupBox(self):
         self.graphGroupBox = QGroupBox("Graphs:")
-        layout = QVBoxLayout()
-
+        layout = QHBoxLayout()
         dataFrame = generateRange(self.unix)
         time = dataFrame['ts']
         time_val = numpy.array(time.values.tolist())
 
         # lpg
-        lpgGraph: PlotWidget = pg.PlotWidget()
+        lpgGraph = PlotWidget()
         lpgValues = dataFrame['lpg']
         lpg_val = numpy.array(lpgValues.values.tolist())
         lpgGraph.plotItem.setTitle('LPG Value')
-        # plot failed
         lpgGraph.plotItem.plot(time_val, lpg_val) #  this works -> fix values from dataframe by using "numpy.array(vals.values.tolist())"
         layout.addWidget(lpgGraph)
-        """
         #temp
         tempGraph = PlotWidget()
         tempValues = dataFrame['temp']
+        temp_val = numpy.array(tempValues.values.tolist())
         tempGraph.plotItem.setTitle('Temperatures')
-        tempGraph.plotItem.plot(time, tempValues)
-        layout.addWidget(tempGraph, 0, 1)
+        tempGraph.plotItem.plot(time_val, temp_val)
+        layout.addWidget(tempGraph)
 
         #smoke
         smokeGraph = PlotWidget()
         smokeValues = dataFrame['smoke']
+        smoke_val = numpy.array(smokeValues.values.tolist())
         smokeGraph.plotItem.setTitle('Smoke')
-        smokeGraph.plotItem.plot(time, smokeValues)
-        layout.addWidget(smokeGraph, 0, 2)
-        """
+        smokeGraph.plotItem.plot(time_val, smoke_val)
+        layout.addWidget(smokeGraph)
+
         self.graphGroupBox.setLayout(layout)
 
     # function to calculate KPI from sensor DATA
