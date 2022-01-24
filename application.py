@@ -1,3 +1,6 @@
+import datetime
+import math
+
 from PyQt5.QtWidgets import *
 import pandas as pds
 from dateutil.parser import parse
@@ -5,6 +8,8 @@ from pyqtgraph import *
 import pyqtgraph as pg
 from csv_interface import generateRange
 import person_check
+import csv_interface
+from csv_interface import *
 
 # Used tutorial for PyQt5: https://build-system.fman.io/pyqt5-tutorial
 from pyqtgraph import PlotWidget
@@ -60,7 +65,6 @@ class AssetApplication(QDialog):
         self.personGroupBox = QGroupBox("Status")
         personInsideLabel = QLabel()
 
-
         people_inside = person_check.checkForPersons(self.unix)
         if people_inside > 0:
             personInsideLabel.setText("Number of people inside: " + str(people_inside))
@@ -99,6 +103,9 @@ class AssetApplication(QDialog):
         dataFrame = generateRange(self.unix)
         time = dataFrame['ts']
         time_val = numpy.array(time.values.tolist())
+        t_mean = time_val.mean()
+        t_mean = math.trunc(t_mean)
+        t = datetime.datetime.fromtimestamp(t_mean)
 
         # lpg
         lpgGraph = PlotWidget()
@@ -106,7 +113,8 @@ class AssetApplication(QDialog):
         lpg_val = numpy.array(lpgValues.values.tolist())
         title = 'LPG Value ' + str(t)
         lpgGraph.plotItem.setTitle(title)
-        lpgGraph.plotItem.plot(time_val, lpg_val)  # this works -> fix values from dataframe by using "numpy.array(vals.values.tolist())"
+        lpgGraph.plotItem.plot(time_val,
+                               lpg_val)  # this works -> fix values from dataframe by using "numpy.array(vals.values.tolist())"
 
         layout.addWidget(lpgGraph)
         lpgGraph.setYRange(0, 0.01)
