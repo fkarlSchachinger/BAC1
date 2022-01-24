@@ -3,6 +3,8 @@ import pandas as pds
 from dateutil.parser import parse
 from pyqtgraph import *
 import pyqtgraph as pg
+
+import csv_interface
 from csv_interface import generateRange
 import person_check
 
@@ -27,7 +29,7 @@ class AssetApplication(QDialog):
         timeLabel.setBuddy(selectedTimeLabel)  # connect label with input time
 
         # Create all the parts
-        self.createStatusBox()
+        self.createDataBox()
         self.createpersonGroupBox()
         self.createGraphGroupBox()
 
@@ -57,15 +59,10 @@ class AssetApplication(QDialog):
         self.setWindowTitle("Asset Status")
 
     def createpersonGroupBox(self):
-        self.personGroupBox = QGroupBox("Person")
+        self.personGroupBox = QGroupBox("Status")
         personInsideLabel = QLabel()
 
-        layout = QVBoxLayout()
-        layout.addWidget(personInsideLabel)
-        layout.addStretch(1)
-        self.personGroupBox.setLayout(layout)
 
-        # dummy, so the other path is reachable
         people_inside = person_check.checkForPersons(self.unix)
         if people_inside > 0:
             personInsideLabel.setText("Number of people inside: " + str(people_inside))
@@ -74,12 +71,27 @@ class AssetApplication(QDialog):
             personInsideLabel.setText("There is currently no one inside.")
             personInsideLabel.setStyleSheet('color: green;')
 
-    def createStatusBox(self):
-        self.statusBox = QGroupBox("Current Status")
         layout = QVBoxLayout()
-        statusLabel = QLabel("Status:")
+        layout.addWidget(personInsideLabel)
+        layout.addStretch(1)
+        self.personGroupBox.setLayout(layout)
 
-        layout.addWidget(statusLabel)
+    def createDataBox(self):
+        self.statusBox = QGroupBox("Performance Indicators")
+        data_frame = generateRange(self.unix)
+
+        lpg_mean = csv_interface.genMean(data_frame, 'lpg')
+        temp_mean = csv_interface.genMean(data_frame, 'temp')
+        smoke_mean = csv_interface.genMean(data_frame, 'smoke')
+
+        layout = QVBoxLayout()
+        lpgLabel = QLabel("Mean concentration of Liquid Petroleum Gas over period (ppm): " + ("%.9f" % lpg_mean))
+        temp_label = QLabel("Mean temperature over period (Fahrenheit): " + ("%.9f" % temp_mean))
+        smoke_label = QLabel("Mean concentration of smoke over period (ppm): " + ("%.9f" % smoke_mean))
+
+        layout.addWidget(lpgLabel)
+        layout.addWidget(temp_label)
+        layout.addWidget(smoke_label)
 
         self.statusBox.setLayout(layout)
 
@@ -97,6 +109,7 @@ class AssetApplication(QDialog):
         lpgGraph.plotItem.setTitle('LPG Value')
         lpgGraph.plotItem.plot(time_val, lpg_val) #  this works -> fix values from dataframe by using "numpy.array(vals.values.tolist())"
         layout.addWidget(lpgGraph)
+
         #temp
         tempGraph = PlotWidget()
         tempValues = dataFrame['temp']
