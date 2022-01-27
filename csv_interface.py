@@ -37,3 +37,6 @@ def genMin(df: pandas.DataFrame, columName:str):
 
 def genMax(df: pandas.DataFrame, columnName:str):
     return df[columnName].max()
+
+def getLatest(df: pandas.DataFrame, columnName:str):
+    return df[columnName].iat[-1]
