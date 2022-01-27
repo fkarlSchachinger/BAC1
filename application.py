@@ -6,13 +6,13 @@ import pandas as pds
 from dateutil.parser import parse
 from pyqtgraph import *
 import pyqtgraph as pg
-from csv_interface import generateRange
 import person_check
 import csv_interface
 from csv_interface import *
 
 # Used tutorial for PyQt5: https://build-system.fman.io/pyqt5-tutorial
 from pyqtgraph import PlotWidget
+from pyqtgraph import *
 
 
 class AssetApplication(QDialog):
@@ -20,6 +20,7 @@ class AssetApplication(QDialog):
         super(AssetApplication, self).__init__(parent)
         self.str_time = str_time
         self.unix = parse(str_time).timestamp()
+        self.people_inside = person_check.checkForPersons(self.unix)
 
         # Setting styleSheet
         with open("style.qss", "r") as styleSheet:
@@ -65,9 +66,9 @@ class AssetApplication(QDialog):
         self.personGroupBox = QGroupBox("Status")
         personInsideLabel = QLabel()
 
-        people_inside = person_check.checkForPersons(self.unix)
-        if people_inside > 0:
-            personInsideLabel.setText("Number of people inside: " + str(people_inside))
+
+        if self.people_inside > 0:
+            personInsideLabel.setText("Number of people inside: " + str(self.people_inside))
             personInsideLabel.setStyleSheet('color: orange;')
         else:
             personInsideLabel.setText("There is currently no one inside.")
@@ -81,19 +82,58 @@ class AssetApplication(QDialog):
     def createDataBox(self):
         self.statusBox = QGroupBox("Performance Indicators")
         data_frame = generateRange(self.unix)
+        layout = QVBoxLayout()
 
+        #min values
+        lpg_low = genMin(data_frame, 'lpg')
+        temp_low = genMin(data_frame, 'temp')
+        smoke_low = genMin(data_frame, 'smoke')
+
+        lpg_low_label = QLabel("Lowest concentration: " + ("%.9f" % lpg_low))
+        temp_low_label = QLabel("Lowest temperature: " + ("%.9f" % temp_low))
+        smoke_low_label = QLabel("Lowest concentration: " + ("%.9f" % smoke_low))
+
+        # mean values
         lpg_mean = csv_interface.genMean(data_frame, 'lpg')
         temp_mean = csv_interface.genMean(data_frame, 'temp')
         smoke_mean = csv_interface.genMean(data_frame, 'smoke')
 
-        layout = QVBoxLayout()
-        lpgLabel = QLabel("Mean concentration of Liquid Petroleum Gas over period (ppm): " + ("%.9f" % lpg_mean))
-        temp_label = QLabel("Mean temperature over period (Fahrenheit): " + ("%.9f" % temp_mean))
-        smoke_label = QLabel("Mean concentration of smoke over period (ppm): " + ("%.9f" % smoke_mean))
+        lpg_mean_label = QLabel("Mean concentration: " + ("%.9f" % lpg_mean))
+        temp_mean_label = QLabel("Mean temperature: " + ("%.9f" % temp_mean))
+        smoke_mean_label = QLabel("Mean concentration: " + ("%.9f" % smoke_mean))
 
-        layout.addWidget(lpgLabel)
-        layout.addWidget(temp_label)
-        layout.addWidget(smoke_label)
+        # peak
+        lpg_max = genMax(data_frame, 'lpg')
+        temp_max = genMax(data_frame, 'temp')
+        smoke_max = genMax(data_frame, 'smoke')
+
+        lpg_max_label = QLabel("Peak concentration: " + ("%.9f" % lpg_max))
+        temp_max_label = QLabel("Peak temperature: " + ("%.9f" % temp_max))
+        smoke_max_label = QLabel("Peak concentration: " + ("%.9f" % smoke_max))
+
+        lpg_layout = QVBoxLayout()
+        lpg_group_box = QGroupBox("LPG concentration in ppm over given period")
+        lpg_layout.addWidget(lpg_low_label)
+        lpg_layout.addWidget(lpg_mean_label)
+        lpg_layout.addWidget(lpg_max_label)
+        lpg_group_box.setLayout(lpg_layout)
+        layout.addWidget(lpg_group_box)
+
+        temp_layout = QVBoxLayout()
+        temp_group_box = QGroupBox("Temperature in Fahrenheit over given period")
+        temp_layout.addWidget(temp_low_label)
+        temp_layout.addWidget(temp_mean_label)
+        temp_layout.addWidget(temp_max_label)
+        temp_group_box.setLayout(temp_layout)
+        layout.addWidget(temp_group_box)
+
+        smoke_layout = QVBoxLayout()
+        smoke_group_box = QGroupBox("Smoke concentration in ppm over given period")
+        smoke_layout.addWidget(smoke_low_label)
+        smoke_layout.addWidget(smoke_mean_label)
+        smoke_layout.addWidget(smoke_max_label)
+        smoke_group_box.setLayout(smoke_layout)
+        layout.addWidget(smoke_group_box)
 
         self.statusBox.setLayout(layout)
 
@@ -115,17 +155,21 @@ class AssetApplication(QDialog):
         lpgGraph.plotItem.setTitle(title)
         lpgGraph.plotItem.plot(time_val,
                                lpg_val)  # this works -> fix values from dataframe by using "numpy.array(vals.values.tolist())"
-
         layout.addWidget(lpgGraph)
         lpgGraph.setYRange(0, 0.01)
+        lpg_limit = InfiniteLine(0.009, pen='red', angle=0)
+        lpgGraph.plotItem.addItem(lpg_limit)
+
         # temp
         tempGraph = PlotWidget()
         tempValues = dataFrame['temp']
         temp_val = numpy.array(tempValues.values.tolist())
         title = 'Temperatures ' + str(t)
         tempGraph.plotItem.setTitle(title)
-        tempGraph.plotItem.plot(time_val, temp_val)
+        temp_limit = InfiniteLine(30, pen='red', angle=0)
+        tempGraph.plotItem.addItem(temp_limit)
         tempGraph.setYRange(15, 30)
+        tempGraph.plotItem.plot(time_val, temp_val)
         layout.addWidget(tempGraph)
 
         # smoke
@@ -134,9 +178,12 @@ class AssetApplication(QDialog):
         smoke_val = numpy.array(smokeValues.values.tolist())
         title = 'Smoke ' + str(t)
         smokeGraph.plotItem.setTitle(title)
+        smoke_limit = InfiniteLine(0.022, pen='red', angle=0)
+        smokeGraph.plotItem.addItem(smoke_limit)
         smokeGraph.plotItem.plot(time_val, smoke_val)
         smokeGraph.setYRange(0.01, 0.03)
         layout.addWidget(smokeGraph)
+
 
         self.graphGroupBox.setLayout(layout)
 
