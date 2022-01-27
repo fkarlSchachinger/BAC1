@@ -31,3 +31,9 @@ def genSmokeMEAN(temp):
 
 def genMean(df: pandas.DataFrame, columnName: str):
     return df[columnName].mean()
+
+def genMin(df: pandas.DataFrame, columName:str):
+    return df[columName].min()
+
+def genMax(df: pandas.DataFrame, columnName:str):
+    return df[columnName].max()
