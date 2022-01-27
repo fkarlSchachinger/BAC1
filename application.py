@@ -7,7 +7,6 @@ import person_check
 import csv_interface
 from csv_interface import *
 from pyqtgraph import *
-from pyqtgraph import PlotItem
 from pyqtgraph import PlotWidget
 
 class AssetApplication(QDialog):
@@ -31,14 +30,21 @@ class AssetApplication(QDialog):
         with open("style.qss", "r") as styleSheet:
             self.setStyleSheet(styleSheet.read())
 
-        # time_short = str_time[0:10]  # cut string for nicer output
+
         formatted_time = datetime.datetime.fromtimestamp(self.unix).strftime("%d.%m.%Y %X")
         # Create Labels Time = inputTime
         selected_time_label = QLabel(formatted_time)  # user input time
         selected_time_label.setStyleSheet('font-size: 24px;')
-        time_label = QLabel("&Time:")  # create label
+        time_label = QLabel("Time:")  # create label
         time_label.setStyleSheet('font-size: 24px;')
         time_label.setBuddy(selected_time_label)  # connect label with input time
+
+        period_label = QLabel("Period: ")
+        period_label.setStyleSheet('font-size: 24px;')
+        period_val_label = QLabel(str(csv_interface.PERIOD_IN_SEC/3600) + "h")
+        period_val_label.setStyleSheet('font-size: 24px;')
+        period_label.setBuddy(period_val_label)
+
 
         # Create all the parts
         self.createDataBox()
@@ -47,9 +53,11 @@ class AssetApplication(QDialog):
 
         # Create upper part (outside of Group boxes)
         upper_left_layout = QHBoxLayout()
-        upper_left_layout.addWidget(time_label, 0)
-        upper_left_layout.addWidget(selected_time_label, 0)
-        upper_left_layout.addStretch(1)
+        upper_left_layout.addWidget(time_label, 1)
+        upper_left_layout.addWidget(selected_time_label, 1)
+        upper_left_layout.addStretch(2)
+        upper_left_layout.addWidget(period_label)
+        upper_left_layout.addWidget(period_val_label)
 
         # Main Layout (this will actually be shown, all other parts should be nested inside this)
         main_layout = QGridLayout()
@@ -71,7 +79,7 @@ class AssetApplication(QDialog):
         self.setWindowTitle("Asset Status")
 
     def createpersonGroupBox(self):
-        self.personGroupBox = QGroupBox("Status")
+        self.personGroupBox = QGroupBox("Current status")
         layout = QVBoxLayout()
 
         person_inside_label = QLabel()
@@ -114,11 +122,12 @@ class AssetApplication(QDialog):
         if (curr_lpg > self.CRITLPG) or (curr_temp > self.CRITTEMP) or (curr_smoke > self.CRITSMOKE):
             warning = True
 
-        current_lpg_label.setStyleSheet(('color: red;' if warning else 'color: green;'))
-        current_temp_label.setStyleSheet(('color: red;' if warning else 'color: green;'))
-        current_smoke_label.setStyleSheet(('color: red;' if warning else 'color: green;'))
+        current_lpg_label.setStyleSheet(('color: red;' if curr_lpg > self.CRITLPG else 'color: green;'))
+        current_temp_label.setStyleSheet(('color: red;' if curr_temp > self.CRITTEMP else 'color: green;'))
+        current_smoke_label.setStyleSheet(('color: red;' if curr_smoke > self.CRITSMOKE else 'color: green;'))
 
         notification_layout = QVBoxLayout()
+        notification_layout.addStretch(1)
         if warning:
             warning_label = QLabel("A critical value has been exceeded")
             warning_label.setStyleSheet('color: orange; font-size: 22px;')
@@ -197,16 +206,16 @@ class AssetApplication(QDialog):
         self.graphGroupBox = QGroupBox("Graphs:")
         layout = QHBoxLayout()
 
-        time = self.data_frame['ts']
-        time_val = numpy.array(time.values.tolist())
+        time_series = self.data_frame['ts']
+        time_val = numpy.array(time_series.values.tolist())
         t_mean = time_val.mean()
         t_mean = math.trunc(t_mean)
-        t = datetime.datetime.fromtimestamp(t_mean).strftime("%d.%m.%Y")
+        title_time = datetime.datetime.fromtimestamp(t_mean).strftime("%d.%m.%Y")
         # lpg
         lpg_graph = PlotWidget()
         lpg_values = self.data_frame['lpg']
         lpg_val = numpy.array(lpg_values.values.tolist())
-        title = 'LPG Value ' + t
+        title = 'LPG Value ' + title_time
         lpg_graph.plotItem.setTitle(title)
         lpg_date_axis = DateAxisItem()
         lpg_graph.plotItem.setAxisItems({'bottom': lpg_date_axis})
@@ -220,13 +229,13 @@ class AssetApplication(QDialog):
         temp_graph = PlotWidget()
         temp_values = self.data_frame['temp']
         temp_val = numpy.array(temp_values.values.tolist())
-        title = 'Temperatures ' + t
+        title = 'Temperatures ' + title_time
         temp_graph.plotItem.setTitle(title)
         temp_date_axis = DateAxisItem()
         temp_graph.plotItem.setAxisItems({'bottom': temp_date_axis})
         temp_limit = InfiniteLine(self.CRITTEMP, pen='red', angle=0)
         temp_graph.plotItem.addItem(temp_limit)
-        temp_graph.setYRange(15, 30)
+        temp_graph.setYRange(15, 35)
         temp_graph.plotItem.plot(time_val, temp_val)
         layout.addWidget(temp_graph)
 
@@ -234,7 +243,7 @@ class AssetApplication(QDialog):
         smoke_graph = PlotWidget()
         smoke_values = self.data_frame['smoke']
         smoke_val = numpy.array(smoke_values.values.tolist())
-        title = 'Smoke ' + t
+        title = 'Smoke ' + title_time
         smoke_graph.plotItem.setTitle(title)
         smoke_date_axis = DateAxisItem()
         smoke_graph.plotItem.setAxisItems({'bottom': smoke_date_axis})
@@ -243,7 +252,6 @@ class AssetApplication(QDialog):
         smoke_graph.plotItem.plot(time_val, smoke_val)
         smoke_graph.setYRange(0.01, 0.03)
         layout.addWidget(smoke_graph)
-
 
         self.graphGroupBox.setLayout(layout)
 

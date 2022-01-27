@@ -1,2 +1,12 @@
 /* Use it like CSS*/
 
+* {
+    color: rgb(80,80,80);
+}
+QLabel {
+    font-size:16px;
+}
+
+QGroupBox {
+    font-size: 16px;
+}

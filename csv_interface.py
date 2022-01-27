@@ -1,11 +1,15 @@
 import pandas as pandas
 
+# change this to read from another CSV file
+CSV_NAME = 'critical_case.csv'
+PERIOD_IN_SEC = 18000
+
 def generateRange(time):  # generate initial time range from user input
     # function is used as base for the other data gen functions
     # function generates the dataframe in only the timerange
 
-    df = pandas.read_csv('test.csv')  # read csv from file into a dataframe
-    tStart = time - 18000  # define range from user input - 3 hours
+    df = pandas.read_csv(CSV_NAME)  # read csv from file into a dataframe
+    tStart = time - PERIOD_IN_SEC  # define range from user input
     tEnd = time
     temp = df[(df['ts'] >= tStart) & (df['ts'] <= tEnd)]  # trim data to time range from start - (start -3h)
     return temp
