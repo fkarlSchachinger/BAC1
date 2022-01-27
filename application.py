@@ -8,7 +8,7 @@ import csv_interface
 from csv_interface import *
 from pyqtgraph import *
 from pyqtgraph import PlotItem
-
+from pyqtgraph import PlotWidget
 
 class AssetApplication(QDialog):
     def __init__(self, str_time, parent=None):
@@ -31,10 +31,13 @@ class AssetApplication(QDialog):
         with open("style.qss", "r") as styleSheet:
             self.setStyleSheet(styleSheet.read())
 
-        time_short = str_time[0:10]  # cut string for nicer output
+        # time_short = str_time[0:10]  # cut string for nicer output
+        formatted_time = datetime.datetime.fromtimestamp(self.unix).strftime("%d.%m.%Y %X")
         # Create Labels Time = inputTime
-        selected_time_label = QLabel(str(time_short))  # user input time
+        selected_time_label = QLabel(formatted_time)  # user input time
+        selected_time_label.setStyleSheet('font-size: 24px;')
         time_label = QLabel("&Time:")  # create label
+        time_label.setStyleSheet('font-size: 24px;')
         time_label.setBuddy(selected_time_label)  # connect label with input time
 
         # Create all the parts
@@ -188,26 +191,29 @@ class AssetApplication(QDialog):
         time_val = numpy.array(time.values.tolist())
         t_mean = time_val.mean()
         t_mean = math.trunc(t_mean)
-        t = datetime.datetime.fromtimestamp(t_mean)
-
+        t = datetime.datetime.fromtimestamp(t_mean).strftime("%d.%m.%Y")
         # lpg
-        lpgGraph = PlotWidget()
-        lpgValues = self.data_frame['lpg']
-        lpg_val = numpy.array(lpgValues.values.tolist())
-        title = 'LPG Value ' + str(t)
-        lpgGraph.plotItem.setTitle(title)
+        lpg_graph = PlotWidget()
+        lpg_values = self.data_frame['lpg']
+        lpg_val = numpy.array(lpg_values.values.tolist())
+        title = 'LPG Value ' + t
+        lpg_graph.plotItem.setTitle(title)
+        lpg_date_axis = DateAxisItem()
+        lpg_graph.plotItem.setAxisItems({'bottom': lpg_date_axis})
         lpg_limit = InfiniteLine(self.CRITLPG, pen='red', angle=0)
-        lpgGraph.plotItem.plot(time_val, lpg_val)
-        lpgGraph.setYRange(0, 0.01)
-        lpgGraph.plotItem.addItem(lpg_limit)
-        layout.addWidget(lpgGraph)
+        lpg_graph.plotItem.plot(time_val, lpg_val)
+        lpg_graph.setYRange(0, 0.01)
+        lpg_graph.plotItem.addItem(lpg_limit)
+        layout.addWidget(lpg_graph)
 
         # temp
         temp_graph = PlotWidget()
         temp_values = self.data_frame['temp']
         temp_val = numpy.array(temp_values.values.tolist())
-        title = 'Temperatures ' + str(t)
+        title = 'Temperatures ' + t
         temp_graph.plotItem.setTitle(title)
+        temp_date_axis = DateAxisItem()
+        temp_graph.plotItem.setAxisItems({'bottom': temp_date_axis})
         temp_limit = InfiniteLine(self.CRITTEMP, pen='red', angle=0)
         temp_graph.plotItem.addItem(temp_limit)
         temp_graph.setYRange(15, 30)
@@ -218,8 +224,10 @@ class AssetApplication(QDialog):
         smoke_graph = PlotWidget()
         smoke_values = self.data_frame['smoke']
         smoke_val = numpy.array(smoke_values.values.tolist())
-        title = 'Smoke ' + str(t)
+        title = 'Smoke ' + t
         smoke_graph.plotItem.setTitle(title)
+        smoke_date_axis = DateAxisItem()
+        smoke_graph.plotItem.setAxisItems({'bottom': smoke_date_axis})
         smoke_limit = InfiniteLine(self.CRITSMOKE, pen='red', angle=0)
         smoke_graph.plotItem.addItem(smoke_limit)
         smoke_graph.plotItem.plot(time_val, smoke_val)
