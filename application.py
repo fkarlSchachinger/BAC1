@@ -81,6 +81,7 @@ class AssetApplication(QDialog):
         else:
             person_inside_label.setText("There is currently no one inside.")
             person_inside_label.setStyleSheet('color: green; font-size: 22px')
+        layout.addWidget(person_inside_label)
 
         # critical values:
         crit_group_box = QGroupBox("Critical values:")
@@ -92,6 +93,7 @@ class AssetApplication(QDialog):
         crit_layout.addWidget(crit_temp_label)
         crit_layout.addWidget(crit_smoke_label)
         crit_group_box.setLayout(crit_layout)
+        layout.addWidget(crit_group_box)
 
         # current values:
         curr_lpg = getLatest(self.data_frame, 'lpg')
@@ -106,6 +108,7 @@ class AssetApplication(QDialog):
         current_layout.addWidget(current_temp_label)
         current_layout.addWidget(current_smoke_label)
         current_group_box.setLayout(current_layout)
+        layout.addWidget(current_group_box)
 
         warning = False
         if (curr_lpg > self.CRITLPG) or (curr_temp > self.CRITTEMP) or (curr_smoke > self.CRITSMOKE):
@@ -115,14 +118,21 @@ class AssetApplication(QDialog):
         current_temp_label.setStyleSheet(('color: red;' if warning else 'color: green;'))
         current_smoke_label.setStyleSheet(('color: red;' if warning else 'color: green;'))
 
+        notification_layout = QVBoxLayout()
         if warning:
             warning_label = QLabel("A critical value has been exceeded")
-            warning_label.setStyleSheet('color: red; font-size: large;')
+            warning_label.setStyleSheet('color: orange; font-size: 22px;')
+            notification_layout.addWidget(warning_label)
+            if self.people_inside > 0:
+                people_warning = QLabel("Caution! Person currently inside")
+                people_warning.setStyleSheet('color: red; font-size: 24px;')
+                notification_layout.addWidget(people_warning)
+        else:
+            okay_label = QLabel("All values within acceptable range")
+            okay_label.setStyleSheet('color: green; font-size: 24px;')
+            notification_layout.addWidget(okay_label)
 
-
-        layout.addWidget(person_inside_label)
-        layout.addWidget(crit_group_box)
-        layout.addWidget(current_group_box)
+        layout.addLayout(notification_layout)
         layout.addStretch(1)
         self.personGroupBox.setLayout(layout)
 
