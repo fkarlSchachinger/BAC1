@@ -1,46 +1,33 @@
 import pandas as pandas
 
-# change this to read from another CSV file
+# File name for the CSV file that should be used
 CSV_NAME = 'critical_case.csv'
 PERIOD_IN_SEC = 18000
 
-def generateRange(time):  # generate initial time range from user input
-    # function is used as base for the other data gen functions
-    # function generates the dataframe in only the timerange
+
+# generate initial time range from user input
+def generateRange(selected_time):
+    # This function generates the dataframe in only the timerange
 
     df = pandas.read_csv(CSV_NAME)  # read csv from file into a dataframe
-    tStart = time - PERIOD_IN_SEC  # define range from user input
-    tEnd = time
-    temp = df[(df['ts'] >= tStart) & (df['ts'] <= tEnd)]  # trim data to time range from start - (start -3h)
-    return temp
+    start_time = selected_time - PERIOD_IN_SEC  # define range from user input
+    end_time = selected_time
+    trimmed_frame = df[(df['ts'] >= start_time) & (df['ts'] <= end_time)]  # trim data to time range from start
+    return trimmed_frame
 
 
-def genlpgMEAN(temp):
-    # generate mean humidity of last 3 hours
-    result = temp['lpg'].mean()
-    return result
+# help functions for easier usage
+def genMean(df: pandas.DataFrame, column_name: str):
+    return df[column_name].mean()
 
 
-def genTempMEAN(temp):
-    # generate mean temperatur of last 3 hours
-    result = temp['temp'].mean()
-    return result
+def genMin(df: pandas.DataFrame, column_name: str):
+    return df[column_name].min()
 
 
-def genSmokeMEAN(temp):
-    # generate mean smoke value
-    result = temp['smoke'].mean()
-    return result
+def genMax(df: pandas.DataFrame, column_name: str):
+    return df[column_name].max()
 
 
-def genMean(df: pandas.DataFrame, columnName: str):
-    return df[columnName].mean()
-
-def genMin(df: pandas.DataFrame, columName:str):
-    return df[columName].min()
-
-def genMax(df: pandas.DataFrame, columnName:str):
-    return df[columnName].max()
-
-def getLatest(df: pandas.DataFrame, columnName:str):
-    return df[columnName].iat[-1]
+def getLatest(df: pandas.DataFrame, column_name: str):
+    return df[column_name].iat[-1]

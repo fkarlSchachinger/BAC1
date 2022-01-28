@@ -1,4 +1,6 @@
-/* Use it like CSS*/
+/*
+    General styling for the application
+*/
 
 * {
     color: rgb(80,80,80);
